@@ -4,7 +4,7 @@ import requests
 
 from selenium import webdriver
 
-from data import Url
+from urls import Url
 from generators import generate_user_data
 
 from pages.login_page import LoginPage

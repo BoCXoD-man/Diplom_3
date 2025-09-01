@@ -2,7 +2,8 @@ import allure
 
 from pages.login_page import LoginPage
 from pages.password_pages import PasswordPage
-from data import ExpectedText, Url
+from data import ExpectedText
+from urls import Url
 
 
 class TestPasswordPage:

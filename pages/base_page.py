@@ -243,7 +243,22 @@ class BasePage:
         return WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located(locator)
         )
-
+    
+    @allure.step("Подождать появления текста в элементе")
+    def wait_for_text_in_element(self, locator: tuple, text: str, timeout: int = 10) -> bool:
+        """
+        Ждёт, пока указанный текст появится в элементе.
+        Args:
+            locator (tuple): локатор элемента (By, value).
+            text (str): ожидаемый текст.
+            timeout (int): таймаут ожидания в секундах.
+        Return:
+            bool: True, если текст появился в течение таймаута.
+        """
+        return WebDriverWait(self.driver, timeout).until(
+            EC.text_to_be_present_in_element(locator, text)
+        )
+    @allure.step("Ждём выполнение любого условия из набора")
     def wait_any(self, conditions, timeout: int = 10, poll_frequency: float = 0.2):
         """
         Ждёт выполнение ЛЮБОГО условия из набора.
@@ -267,6 +282,7 @@ class BasePage:
 
         return WebDriverWait(self.driver, timeout, poll_frequency).until(_any_condition)
 
+    @allure.step("Проверить наличие элемента в DOM")
     def is_present(self, locator: tuple, timeout: int = 0) -> bool:
         """
         Проверяет наличие элемента в DOM (без падения теста).
@@ -285,6 +301,7 @@ class BasePage:
         except Exception:
             return False
 
+    @allure.step('Ждём, пока URL будет содержать подстроку: "{url_substring}"')
     def wait_for_url(self, url_substring: str, timeout: int = 10) -> bool:
         """
         Ждёт, пока текущий URL будет содержать указанную подстроку.
@@ -296,3 +313,17 @@ class BasePage:
         """
         WebDriverWait(self.driver, timeout).until(EC.url_contains(url_substring))
         return True
+    
+    @allure.step("Универсальное ожидание по предикату")
+    def wait_until(self, predicate, timeout: int = 10, poll_frequency: float = 0.2):
+        """
+        Выполняет ожидание, пока переданный предикат вернёт истину.
+        Предикат должен принимать драйвер и возвращать truthy-значение.
+        Args:
+            predicate (Callable): функция вида predicate(driver) -> Any.
+            timeout (int): таймаут ожидания в секундах.
+            poll_frequency (float): частота опроса предиката.
+        Return:
+            Any: результат предиката, когда он вернёт истину.
+        """
+        return WebDriverWait(self.driver, timeout, poll_frequency).until(predicate)

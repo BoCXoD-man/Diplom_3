@@ -2,7 +2,8 @@ import allure
 
 from pages.burger_constructor_page import MainPage
 from pages.feed_page import OrderFeedPage
-from data import Url, ExpectedText
+from data import  ExpectedText
+from urls import Url
 from locators.burger_constructor_page_locators import MainPageLocators
 
 

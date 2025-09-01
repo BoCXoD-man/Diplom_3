@@ -2,7 +2,7 @@ import allure
 
 from pages.profile_page import PersonalPage
 from pages.burger_constructor_page import MainPage
-from data import Url
+from urls import Url
 
 
 class TestPersonalAcc:

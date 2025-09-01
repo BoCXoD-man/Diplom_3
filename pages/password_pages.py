@@ -1,8 +1,4 @@
 import allure
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-
 from pages.base_page import BasePage
 from locators.password_pages_locators import PasswordLocators
 
@@ -29,24 +25,21 @@ class PasswordPage(BasePage):
         """
         Нажимает кнопку «Восстановить» на форме e-mail и ожидает переход
         на экран ввода кода: либо смены URL на /reset-password, либо появления
-        текста «Введите код из письма». После этого пробует дождаться поля ввода кода.
+        подписи «Введите код из письма». После этого ждёт поле ввода кода.
         """
         self.click_on_element(PasswordLocators.BTN_RECOVER)
 
-        # Пытаемся дождаться смены URL на /reset-password
-        try:
-            WebDriverWait(self.driver, 8).until(EC.url_contains("/reset-password"))
-        except TimeoutException:
-            # Если URL не сменился, ждём появления явного текста-подсказки
-            WebDriverWait(self.driver, 8).until(
-                EC.presence_of_element_located(PasswordLocators.LABEL_CODE_HINT)
-            )
+        # ждём либо URL /reset-password, либо ярлык-подсказку
+        self.wait_any(
+            conditions=[
+                lambda d: self.wait_for_url("/reset-password", timeout=1) or True,
+                lambda d: self.is_present(PasswordLocators.LABEL_CODE_HINT, timeout=1)
+            ],
+            timeout=10
+        )
 
-        try:
-            self.wait_for_presence(PasswordLocators.CODE_INPUT, timeout=5)
-        except Exception:
-            # Если инпута нет 
-            pass
+        # финально убеждаемся, что инпут кода есть в DOM
+        self.wait_for_presence(PasswordLocators.CODE_INPUT, timeout=10)
 
     @allure.step('Получить текст подсказки/placeholder для поля кода')
     def get_text_of_code_input(self) -> str:

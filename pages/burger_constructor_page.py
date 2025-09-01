@@ -2,8 +2,6 @@ import allure
 
 from pages.base_page import BasePage
 from locators.burger_constructor_page_locators import MainPageLocators
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.common.exceptions import TimeoutException
 
@@ -105,6 +103,7 @@ class MainPage(BasePage):
         self.drop_bun_into_order_sector()
         self.click_on_create_order_button()
     
+
     @allure.step('Перетащить булку в конструктор бургера')
     def drop_bun_into_order_sector(self):
         """
@@ -120,14 +119,10 @@ class MainPage(BasePage):
 
         # в FF UI может обновляться чуть дольше — ждём счётчик '2'
         try:
-            WebDriverWait(self.driver, 8).until(
-                EC.text_to_be_present_in_element(MainPageLocators.COUNTER_FIRST_INGREDIENT, '2')
-            )
+            self.wait_for_text_in_element(MainPageLocators.COUNTER_FIRST_INGREDIENT, '2', timeout=8)
         except TimeoutException:
             # если интерфейс ещё не успел, даём последний шанс
-            WebDriverWait(self.driver, 5).until(
-                EC.text_to_be_present_in_element(MainPageLocators.COUNTER_FIRST_INGREDIENT, '2')
-            )
+            self.wait_for_text_in_element(MainPageLocators.COUNTER_FIRST_INGREDIENT, '2', timeout=5)
 
     @allure.step('Получить значение счётчика ингредиента')
     def get_counter_number(self):

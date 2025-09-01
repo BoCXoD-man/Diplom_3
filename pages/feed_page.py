@@ -2,8 +2,6 @@ import allure
 
 from locators.feed_page_locators import OrderFeedPageLocators
 from pages.burger_constructor_page import MainPage
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class OrderFeedPage(MainPage):
@@ -89,6 +87,8 @@ class OrderFeedPage(MainPage):
         Args:
             previous_value (int): предыдущее значение счётчика.
             timeout (int): таймаут ожидания в секундах.
+        Return:
+            None: исключение не выбрасывается, если условие выполнено.
         """
         def counter_has_increased(driver):
             try:
@@ -97,4 +97,21 @@ class OrderFeedPage(MainPage):
             except Exception:
                 return False
 
-        WebDriverWait(self.driver, timeout).until(counter_has_increased)
+        self.wait_until(counter_has_increased, timeout=timeout)
+
+    @allure.step('Ожидать увеличения счётчика заказов за сегодня')
+    def wait_for_today_orders_counter_to_increase(self, previous_value: int, timeout: int = 30):
+        """
+        Ждёт, пока счётчик "Выполнено за сегодня" увеличится относительно переданного значения.
+        Args:
+            previous_value (int): предыдущее значение счётчика.
+            timeout (int): таймаут ожидания.
+        """
+        def predicate(_):
+            try:
+                current = int(self.get_number_of_today_orders_counter())
+                return current > previous_value
+            except Exception:
+                return False
+
+        self.wait_until(predicate, timeout=timeout)
